@@ -1,0 +1,14 @@
+Package: ggreheat
+Title: Reheats Stale Heat Maps
+Version: 0.0.1
+Authors@R: 
+    person("Kyla", "Belisario", , "kyla_belisario@protonmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-5403-9531"))
+Description: This package reinvigorates heatmaps as a visualization technique to allow for both Pearson's r and Spearman's rho to be visualized 
+     in a single heatmap. It also can be used to calculate confidence intervals for Pearson's r coefficients via Fisher Z transformations. Using
+     a binary grouping variable, confidence intervals that do not overlap can also be highlighted.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports: ggplot2, rlang
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
