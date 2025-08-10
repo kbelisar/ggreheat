@@ -12,6 +12,24 @@
 #' @param colour The colour of the outline for variables identified in 'vars2' when 'diff' is set to "outline". The default is a dark grey.
 #' @param triangle Whether the heatmap takes on a square or triangle form. The default is FALSE.
 #' @param vars_rename Optional names to reassign to the variables (in order of the variables identified in the vars1 and vars2 arguments).
+#' @examples
+#'
+#' ### --- Load Simulated Data
+#'
+#' data("reheat_data")
+#'
+#' ### --- Heatmap with Pearson and Spearman correlations
+#'
+#' ### The default 'type1' argument is Pearson correlations for 'vars1' variables
+#' ### The default 'type2' argument is Spearman correlations for 'vars2' variables
+#' ### Variables in 'vars2' argument will be denoted with a round tile
+#'
+#' ggdefrost(reheat_data,
+#' vars1 = c("audit_score","sip_score","drinks_per_week","cudit_score","ftnd_score"),
+#' vars2 = c("cannabis_assist","cigarette_assist","ecigarette_assist"),
+#' diff = "round")
+#'
+#' @return A ggplot graphical object.
 #' @export
 
 globalVariables(c("Var1","Var2","coefficient","pval_sign","differential"))

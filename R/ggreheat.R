@@ -14,6 +14,21 @@
 #' @param tile_type The type of tile corner to use in the heatmap. One of c("square","round"), with the default being "square".
 #' @param triangle Whether the heatmap takes on a square or triangle form. The default is FALSE.
 #' @param vars_rename Optional names to reassign to the variables listed in the vars argument.
+#'
+#' @examples
+#' ### --- Load Simulated Data
+#'
+#' data("reheat_data")
+#'
+#' ### --- Heatmap with Fisher Z 95% CIs
+#'
+#' ### Variables with non-overlapping CIs between group A and B will be outlined
+#'
+#' ggreheat(reheat_data,
+#' vars = c("audit_score","sip_score","drinks_per_week","cudit_score","ftnd_score"),
+#' by = "group", include_ci = TRUE)
+#'
+#' @return A ggplot graphical object.
 #' @export
 
 globalVariables(c("Var1","Var2","coefficient","pval_sign","CI","no_overlap"))

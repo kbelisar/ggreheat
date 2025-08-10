@@ -28,8 +28,25 @@ correlation coefficient. If creating side-by-side heatmaps, the confidence inter
 
 \item{vars_rename}{Optional names to reassign to the variables listed in the vars argument.}
 }
+\value{
+A ggplot graphical object.
+}
 \description{
 This function is used to produce a heatmap using a single correlation coefficient (Pearson's r or Spearman's rho). It can also create side-by-side heatmaps for
 a single binary grouping variable. When calculating Pearson's r, confidence intervals produced from Fisher Z transformations can also be displayed alongside the
 correlation coefficient. If creating side-by-side heatmaps, the confidence intervals which do not overlap between the two groups will be highlighted.
+}
+\examples{
+### --- Load Simulated Data
+
+data("reheat_data")
+
+### --- Heatmap with Fisher Z 95\% CIs
+
+### Variables with non-overlapping CIs between group A and B will be outlined
+
+ggreheat(reheat_data,
+vars = c("audit_score","sip_score","drinks_per_week","cudit_score","ftnd_score"),
+by = "group", include_ci = TRUE)
+
 }

@@ -26,6 +26,27 @@
 
 \item{vars_rename}{Optional names to reassign to the variables (in order of the variables identified in the vars1 and vars2 arguments).}
 }
+\value{
+A ggplot graphical object.
+}
 \description{
 This function is used to produce a single heatmap which combines two different correlation coefficients (Pearson's R and Spearman's Rho). Variables will be ordered from left to right and bottom to top as identified in 'vars1' and' vars2'.
+}
+\examples{
+
+### --- Load Simulated Data
+
+data("reheat_data")
+
+### --- Heatmap with Pearson and Spearman correlations
+
+### The default 'type1' argument is Pearson correlations for 'vars1' variables
+### The default 'type2' argument is Spearman correlations for 'vars2' variables
+### Variables in 'vars2' argument will be denoted with a round tile
+
+ggdefrost(reheat_data,
+vars1 = c("audit_score","sip_score","drinks_per_week","cudit_score","ftnd_score"),
+vars2 = c("cannabis_assist","cigarette_assist","ecigarette_assist"),
+diff = "round")
+
 }
