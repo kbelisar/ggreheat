@@ -1,4 +1,4 @@
-### The following is adapted code to create rounded geom_tile corners from both the ggplot2 geom_tile function source code and from
+### The following is adapted code to create rounded geom_tile corners from both the ggplot2 geom_tile() function source code and from
 ### boB Rudis' package statebins (adapted from geomRrect: https://github.com/hrbrmstr/statebins/blob/master/R/geom-rrect.r)
 
 #' @name `%||%`
@@ -13,7 +13,7 @@
 geom_round_tile <- function(mapping = NULL, data = NULL,
                             stat = "identity", position = "identity",
                             ...,
-                            linewidth = NULL,
+                            linewidth = NA,
                             na.rm = FALSE,
                             show.legend = NA,
                             inherit.aes = TRUE) {
@@ -27,6 +27,7 @@ geom_round_tile <- function(mapping = NULL, data = NULL,
     inherit.aes = inherit.aes,
     params = list(
       na.rm = na.rm,
+      linewidth = linewidth,
       ...
     )
   )
@@ -46,7 +47,7 @@ GeomRoundTile <- ggplot2::ggproto("GeomRoundTile", ggplot2::GeomRect,
                                     )
                                   },
 
-                                  default_aes = ggplot2::aes(colour = NA, fill = NA, alpha = NA, width = NA, height = NA),
+                                  default_aes = ggplot2::aes(colour = NA, fill = NA, alpha = NA, width = NA, height = NA, linewidth = NA),
 
                                   required_aes = c("x", "y"),
 
@@ -66,7 +67,7 @@ GeomRoundTile <- ggplot2::ggproto("GeomRoundTile", ggplot2::GeomRect,
                                         gp = grid::gpar(
                                           col = coords$colour[i],
                                           fill = ggplot2::alpha(coords$fill[i], coords$alpha[i]),
-                                          lwd = coords$size[i],
+                                          lwd = coords$linewidth[i] * ggplot2::.pt,
                                           lty = coords$linetype[i]
                                         )
                                       )

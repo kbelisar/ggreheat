@@ -2,7 +2,7 @@
 % Please edit documentation in R/ggdefrost.R
 \name{ggdefrost}
 \alias{ggdefrost}
-\title{This function is used to produce a single heatmap which combines two different correlation coefficients (Pearson's R and Spearman's Rho). Variables will be ordered from left to right and bottom to top as identified in 'vars1' and' vars2'.}
+\title{This function is used to produce a single heatmap which combines two different correlation coefficients (Pearson's R and Spearman's Rho).}
 \arguments{
 \item{data}{A data frame consisting of the variables to be included in the heatmap.}
 
@@ -16,7 +16,7 @@
 
 \item{diff}{The characteristic used to differentiate the variables listed in the 'vars2' argument. One of c("outline","round"), with the default being "outline".}
 
-\item{alpha}{The alpha value to determine significance, in which significant p-values will have the corresponding correlation coefficient in the heatmap denoted in bold text. The default alpha value is 0.05.}
+\item{alpha}{The alpha value to determine significance, in which significant p-values will have the corresponding correlation coefficient in the heatmap denoted in bold text. The default alpha threshold is 0.05.}
 
 \item{coef_size}{The size of the correlation coefficient in the heatmap. The default is 7.}
 
@@ -24,13 +24,15 @@
 
 \item{triangle}{Whether the heatmap takes on a square or triangle form. The default is FALSE.}
 
-\item{vars_rename}{Optional names to reassign to the variables (in order of the variables identified in the vars1 and vars2 arguments).}
+\item{vars_reorder}{Option to reorder the variables as they appear in the heatmap. The default is 'vars1' followed by 'vars2' from left to right on the x-axis.}
+
+\item{vars_rename}{Optional names to reassign to the variables. If 'vars_reorder' argument is used, the names must be in the order of the variables in this argument, otherwise they must be in the order of the 'vars1' and 'vars2' arguments.}
 }
 \value{
 A ggplot graphical object.
 }
 \description{
-This function is used to produce a single heatmap which combines two different correlation coefficients (Pearson's R and Spearman's Rho). Variables will be ordered from left to right and bottom to top as identified in 'vars1' and' vars2'.
+This function is used to produce a single heatmap which combines two different correlation coefficients (Pearson's R and Spearman's Rho).
 }
 \examples{
 
@@ -47,6 +49,8 @@ data("reheat_data")
 ggdefrost(reheat_data,
 vars1 = c("audit_score","sip_score","drinks_per_week","cudit_score","ftnd_score"),
 vars2 = c("cannabis_assist","cigarette_assist","ecigarette_assist"),
+vars_reorder = c("audit_score","sip_score","drinks_per_week","cudit_score",
+"cannabis_assist","ftnd_score","cigarette_assist","ecigarette_assist"),
 diff = "round")
 
 }

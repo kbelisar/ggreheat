@@ -7,7 +7,7 @@
 #' @param vars The list of variables to be included in the heatmap.
 #' @param type The type of correlation coefficient to calculate. The default is "pearson". One of c("pearson","spearman").
 #' @param by A binary variable to create side-by-side heatmaps. If defined, side-by-side heatmaps will be created by the binary variable.
-#' @param alpha The alpha value to determine significance, in which significant p-values will have the corresponding correlation coefficient in the heatmap denoted in bold text. The default alpha value is 0.05.
+#' @param alpha The alpha value to determine significance, in which significant p-values will have the corresponding correlation coefficient in the heatmap denoted in bold text. The default alpha threshold is 0.05.
 #' @param include_ci Whether confidence intervals calculated using Fisher Z transformations should be displayed in the heatmap. Only available when 'type' is "pearson". The default is TRUE.
 #' @param coef_size The size of the correlation coefficient in the heatmap. The default is 7.
 #' @param colour_ci The colour of the outline for highlighting Fisher Z transformations CIs that do not overlap. Available when type is "pearson" and a 'by' variable is defined. The default is a dark grey.
@@ -22,10 +22,11 @@
 #'
 #' ### --- Heatmap with Fisher Z 95% CIs
 #'
-#' ### Variables with non-overlapping CIs between group A and B will be outlined
+#' ### N.B. Variables with non-overlapping CIs between group A and B will be outlined
 #'
 #' ggreheat(reheat_data,
 #' vars = c("audit_score","sip_score","drinks_per_week","cudit_score","ftnd_score"),
+#' vars_rename = c("AUDIT Score","SIP Score","Drinks per Week","CUDIT Score","FTND Score"),
 #' by = "group", include_ci = TRUE)
 #'
 #' @return A ggplot graphical object.
@@ -171,6 +172,11 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
       colnames(pval_final) <- vars
       rownames(pval_final) <- vars
 
+      if(triangle==TRUE){
+        corr_final <- upper_tri(corr_final)
+        pval_final <- upper_tri(pval_final)
+      }
+
       if(include_ci==TRUE){
         for(i in 1:length(corr_dat_g)){
           ci_corr_g[[i]] <- sapply(corr_dat_g[[i]][1:length(corr_dat_g)], "[[","conf.int", simplify = FALSE)
@@ -207,6 +213,11 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
                         pval_dat[c("Var1","Var2","pval_sign")], by = c("Var1","Var2"), all = TRUE)
 
       if(include_ci==TRUE){
+
+        if(triangle==TRUE){
+          ci_final <- upper_tri(ci_final)
+        }
+
         ci_dat <- base_melt(ci_final)
 
         ci_dat$CI <- ci_dat$value
@@ -252,7 +263,7 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
       ## linewidth units == 0.01 width/height unit
       hm_plot <- ggplot2::ggplot(data = corr_dat, ggplot2::aes(Var2, Var1)) +
         ggplot2::geom_tile(corr_dat, mapping = ggplot2::aes(Var2, Var1, fill = coefficient), width = 0.9, height = 0.9) +
-        ggplot2::scale_fill_gradient2(low = "#5f6488", high = "#5f8883", mid = "#c8c8c9",
+        ggplot2::scale_fill_gradient2(low = "#5c908e", high = "#7c7eab", mid = "#c8c8c9",
                                       midpoint = 0, limit = c(-1,1), space = "Lab",
                                       name = corr_type) +
         ggplot2::scale_y_discrete(position = "right") + ggplot2::theme_minimal() + ggplot2::coord_fixed(clip = "off") +
@@ -260,11 +271,12 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
                        axis.title = ggplot2::element_blank(),
                        panel.grid.major = ggplot2::element_blank(),
                        panel.border = ggplot2::element_blank(),
-                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = "0.5"),
+                       plot.margin = ggplot2::margin(t = 10,r = 30, b = 10, l = 45),
+                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = 0.5),
                        legend.title = ggplot2::element_text(face = "bold",size = 15, hjust = 0.5),
                        legend.direction = "horizontal",
                        legend.position = "bottom",
-                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black"),
+                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black", hjust = 0),
                        axis.text.x = ggplot2::element_text(face = "bold", size = 20, angle = 30, vjust = 1, hjust = 1, colour = "black"),
                        axis.line = ggplot2::element_line(linewidth = 2, lineend = "square"),
                        axis.ticks.length = ggplot2::unit(3,"mm"),
@@ -276,7 +288,7 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
       ## linewidth units == 0.01 width/height unit
       hm_plot <- ggplot2::ggplot(data = corr_dat, ggplot2::aes(Var2, Var1)) +
         geom_round_tile(corr_dat, mapping = ggplot2::aes(Var2, Var1, fill = coefficient), width = 0.9, height = 0.9) +
-        ggplot2::scale_fill_gradient2(low = "#5f6488", high = "#5f8883", mid = "#c8c8c9",
+        ggplot2::scale_fill_gradient2(low = "#5c908e", high = "#7c7eab", mid = "#c8c8c9",
                                       midpoint = 0, limit = c(-1,1), space = "Lab",
                                       name = corr_type) +
         ggplot2::scale_y_discrete(position = "right") + ggplot2::theme_minimal() + ggplot2::coord_fixed(clip = "off") +
@@ -284,11 +296,12 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
                        axis.title = ggplot2::element_blank(),
                        panel.grid.major = ggplot2::element_blank(),
                        panel.border = ggplot2::element_blank(),
-                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = "0.5"),
+                       plot.margin = ggplot2::margin(t = 10,r = 30, b = 10, l = 45),
+                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = 0.5),
                        legend.title = ggplot2::element_text(face = "bold",size = 15, hjust = 0.5),
                        legend.direction = "horizontal",
                        legend.position = "bottom",
-                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black"),
+                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black", hjust = 0),
                        axis.text.x = ggplot2::element_text(face = "bold", size = 20, angle = 30, vjust = 1, hjust = 1, colour = "black"),
                        axis.line = ggplot2::element_line(linewidth = 2, lineend = "square"),
                        axis.ticks.length = ggplot2::unit(3,"mm"),
@@ -300,23 +313,23 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
     hm_plot <- hm_plot +
       ggplot2::geom_text(corr_dat[(corr_dat$pval_sign=="N.S." & !is.na(corr_dat$pval_sign)),],
                          mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                         size = coef_size, colour = "#333333", show.legend = FALSE) +
+                         size = coef_size, colour = "#333333", show.legend = FALSE, na.rm = TRUE) +
       ggplot2::geom_text(corr_dat[(corr_dat$pval_sign!="N.S." & !is.na(corr_dat$pval_sign)),],
                          mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                         size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE)
+                         size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, na.rm = TRUE)
   }
 
   if(include_ci==TRUE){
     hm_plot <- hm_plot +
       ggplot2::geom_text(corr_dat[(corr_dat$pval_sign=="N.S." & !is.na(corr_dat$pval_sign)),],
                          mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                         size = coef_size, colour = "#333333", show.legend = FALSE, vjust = 0) +
+                         size = coef_size, colour = "#333333", show.legend = FALSE, vjust = 0, na.rm = TRUE) +
       ggplot2::geom_text(corr_dat[(corr_dat$pval_sign!="N.S." & !is.na(corr_dat$pval_sign)),],
                          mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                         size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, vjust = 0) +
+                         size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, vjust = 0, na.rm = TRUE) +
       ggplot2::geom_text(corr_dat,
                          mapping = ggplot2::aes(Var2, Var1, label = CI),
-                         size = coef_size*0.7, fontface = "italic", colour = "#000000", show.legend = FALSE, vjust = 2)
+                         size = coef_size*0.7, fontface = "italic", colour = "#000000", show.legend = FALSE, vjust = 2, na.rm = TRUE)
   }
   }
 
@@ -326,7 +339,7 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
       ## linewidth units == 0.01 width/height unit
       hm_plot <- ggplot2::ggplot(data = group_corr, ggplot2::aes(Var2, Var1)) + ggplot2::facet_wrap(~by_var) +
         ggplot2::geom_tile(group_corr, mapping = ggplot2::aes(Var2, Var1,fill = coefficient), width = 0.9, height = 0.9) +
-        ggplot2::scale_fill_gradient2(low = "#5f6488", high = "#5f8883", mid = "#c8c8c9",
+        ggplot2::scale_fill_gradient2(low = "#5c908e", high = "#7c7eab", mid = "#c8c8c9",
                                       midpoint = 0, limit = c(-1,1), space = "Lab",
                                       name = corr_type) +
         ggplot2::scale_y_discrete(position = "right") + ggplot2::theme_minimal() + ggplot2::coord_fixed(clip = "off") +
@@ -337,11 +350,12 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
                        axis.title = ggplot2::element_blank(),
                        panel.grid.major = ggplot2::element_blank(),
                        panel.border = ggplot2::element_blank(),
-                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = "0.5"),
+                       plot.margin = ggplot2::margin(t = 10,r = 30, b = 10, l = 45),
+                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = 0.5),
                        legend.title = ggplot2::element_text(face = "bold",size = 15, hjust = 0.5),
                        legend.direction = "horizontal",
                        legend.position = "bottom",
-                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black"),
+                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black", hjust = 0),
                        axis.text.x = ggplot2::element_text(face = "bold", size = 20, angle = 30, vjust = 1, hjust = 1, colour = "black"),
                        axis.line = ggplot2::element_line(linewidth = 2, lineend = "square"),
                        axis.ticks.length = ggplot2::unit(3,"mm"),
@@ -353,7 +367,7 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
       ## linewidth units == 0.01 width/height unit
       hm_plot <- ggplot2::ggplot(data = group_corr, ggplot2::aes(Var2, Var1)) + ggplot2::facet_wrap(~by_var) +
         geom_round_tile(group_corr, mapping = ggplot2::aes(Var2, Var1,fill = coefficient), width = 0.9, height = 0.9) +
-        ggplot2::scale_fill_gradient2(low = "#5f6488", high = "#5f8883", mid = "#c8c8c9",
+        ggplot2::scale_fill_gradient2(low = "#5c908e", high = "#7c7eab", mid = "#c8c8c9",
                                       midpoint = 0, limit = c(-1,1), space = "Lab",
                                       name = corr_type) +
         ggplot2::scale_y_discrete(position = "right") + ggplot2::theme_minimal() + ggplot2::coord_fixed(clip = "off") +
@@ -364,11 +378,12 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
                        axis.title = ggplot2::element_blank(),
                        panel.grid.major = ggplot2::element_blank(),
                        panel.border = ggplot2::element_blank(),
-                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = "0.5"),
+                       plot.margin = ggplot2::margin(t = 10,r = 30, b = 10, l = 45),
+                       legend.text = ggplot2::element_text(size = 15, face = "bold", hjust = 0.5),
                        legend.title = ggplot2::element_text(face = "bold",size = 15, hjust = 0.5),
                        legend.direction = "horizontal",
                        legend.position = "bottom",
-                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black"),
+                       axis.text.y = ggplot2::element_text(face = "bold", size = 20, colour = "black", hjust = 0),
                        axis.text.x = ggplot2::element_text(face = "bold", size = 20, angle = 30, vjust = 1, hjust = 1, colour = "black"),
                        axis.line = ggplot2::element_line(linewidth = 2, lineend = "square"),
                        axis.ticks.length = ggplot2::unit(3,"mm"),
@@ -381,10 +396,10 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
       hm_plot <- hm_plot +
         ggplot2::geom_text(group_corr[(group_corr$pval_sign=="N.S." & !is.na(group_corr$pval_sign)),],
                            mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                           size = coef_size, colour = "#333333", show.legend = FALSE) +
+                           size = coef_size, colour = "#333333", show.legend = FALSE, na.rm = TRUE) +
         ggplot2::geom_text(group_corr[(group_corr$pval_sign!="N.S." & !is.na(group_corr$pval_sign)),],
                            mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                           size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE)
+                           size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, na.rm = TRUE)
     }
 
     if(include_ci==TRUE){
@@ -395,13 +410,13 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
           ggplot2::scale_colour_manual("",values = c(ggplot2::alpha("#333333",0),colour_ci)) +
           ggplot2::geom_text(group_corr[(group_corr$pval_sign=="N.S." & !is.na(group_corr$pval_sign)),],
                              mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                             size = coef_size, colour = "#333333", show.legend = FALSE, vjust = 0) +
+                             size = coef_size, colour = "#333333", show.legend = FALSE, vjust = 0, na.rm = TRUE) +
           ggplot2::geom_text(group_corr[(group_corr$pval_sign!="N.S." & !is.na(group_corr$pval_sign)),],
                              mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                             size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, vjust = 0) +
+                             size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, vjust = 0, na.rm = TRUE) +
           ggplot2::geom_text(group_corr,
                              mapping = ggplot2::aes(Var2, Var1, label = CI),
-                             size = coef_size*0.7, fontface = "italic", colour = "#000000", show.legend = FALSE, vjust = 2)
+                             size = coef_size*0.7, fontface = "italic", colour = "#000000", show.legend = FALSE, vjust = 2, na.rm = TRUE)
       }
       if(tile_type=="round"){
         hm_plot <- hm_plot +
@@ -409,13 +424,13 @@ ggreheat <- function(data, vars = NULL, type = "pearson", by = NULL, alpha = 0.0
           ggplot2::scale_colour_manual("",values = c(ggplot2::alpha("#333333",0),colour_ci)) +
           ggplot2::geom_text(group_corr[(group_corr$pval_sign=="N.S." & !is.na(group_corr$pval_sign)),],
                              mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                             size = coef_size, colour = "#333333", show.legend = FALSE, vjust = 0) +
+                             size = coef_size, colour = "#333333", show.legend = FALSE, vjust = 0, na.rm = TRUE) +
           ggplot2::geom_text(group_corr[(group_corr$pval_sign!="N.S." & !is.na(group_corr$pval_sign)),],
                              mapping = ggplot2::aes(Var2, Var1, label = format(round(coefficient,2),nsmall = 2), colour = pval_sign),
-                             size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, vjust = 0) +
+                             size = coef_size, fontface = "bold", colour = "#000000", show.legend = FALSE, vjust = 0, na.rm = TRUE) +
           ggplot2::geom_text(group_corr,
                              mapping = ggplot2::aes(Var2, Var1, label = CI),
-                             size = coef_size*0.7, fontface = "italic", colour = "#000000", show.legend = FALSE, vjust = 2)
+                             size = coef_size*0.7, fontface = "italic", colour = "#000000", show.legend = FALSE, vjust = 2, na.rm = TRUE)
 
       }
      }

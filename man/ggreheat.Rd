@@ -14,7 +14,7 @@ correlation coefficient. If creating side-by-side heatmaps, the confidence inter
 
 \item{by}{A binary variable to create side-by-side heatmaps. If defined, side-by-side heatmaps will be created by the binary variable.}
 
-\item{alpha}{The alpha value to determine significance, in which significant p-values will have the corresponding correlation coefficient in the heatmap denoted in bold text. The default alpha value is 0.05.}
+\item{alpha}{The alpha value to determine significance, in which significant p-values will have the corresponding correlation coefficient in the heatmap denoted in bold text. The default alpha threshold is 0.05.}
 
 \item{include_ci}{Whether confidence intervals calculated using Fisher Z transformations should be displayed in the heatmap. Only available when 'type' is "pearson". The default is TRUE.}
 
@@ -43,10 +43,11 @@ data("reheat_data")
 
 ### --- Heatmap with Fisher Z 95\% CIs
 
-### Variables with non-overlapping CIs between group A and B will be outlined
+### N.B. Variables with non-overlapping CIs between group A and B will be outlined
 
 ggreheat(reheat_data,
 vars = c("audit_score","sip_score","drinks_per_week","cudit_score","ftnd_score"),
+vars_rename = c("AUDIT Score","SIP Score","Drinks per Week","CUDIT Score","FTND Score"),
 by = "group", include_ci = TRUE)
 
 }
