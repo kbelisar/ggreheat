@@ -1,10 +1,10 @@
 # ggreheat
 
-A package that reheats stale heat maps!
+A package that reheats stale heatmaps!
 
 ### ggdefrost
 
-Defrosting typical heat map visualizations by adding an option to include Pearson and Spearman correlations in one heat map. The different correlation coefficients are defined by either an outline or by a rounded tile shape.
+Defrosting typical heatmap visualizations by adding an option to include Pearson and Spearman correlations in one heatmap. The different correlation coefficients are defined by either an outline or by a rounded tile shape.
 
 <p align="center">
 <img width="700" height="450" src="https://github.com/kbelisar/ggreheat/blob/main/visualizations/ggdefrost_example.png">
